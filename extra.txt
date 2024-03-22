@@ -1,0 +1,180 @@
+// let lastFetchedTimestampA = null; // Initialize last fetched timestamp for table A
+// let lastFetchedIdA = null; // Initialize last fetched ID for table A
+// let lastFetchedTimestampB = null; // Initialize last fetched timestamp for table B
+// let lastFetchedIdB = null; // Initialize last fetched ID for table B
+
+// app.get("/", async (req, res) => {
+//   try {
+//     // Check for new data in cloudDB table A
+//     let queryA = cloudDB("IMPL_MACHINEMASTER").select("MACHINEID");
+//     if (lastFetchedTimestampA || lastFetchedIdA) {
+//       queryA = queryA
+//         .where("timestamp_column", ">", lastFetchedTimestampA)
+//         .orWhere("id_column", ">", lastFetchedIdA); // Replace timestamp_column with the actual timestamp column name
+//     }
+//     const newDataA = await queryA;
+
+//     if (newDataA.length > 0) {
+//       // Update last fetched timestamp for table A
+//       lastFetchedTimestampA = newDataA[newDataA.length - 1].timestamp_column; // Update timestamp_column with the actual timestamp column name
+//       lastFetchedIdA = newDataA[newDataA.length - 1].id_column;
+
+//       // Insert new data into localDB table A
+//       await localDB("tableA").insert(newDataA);
+//     }
+
+//     let queryB = localDB("IMPL_MACHINEMASTER").select("MACHINEID");
+//     if (lastFetchedTimestampB || lastFetchedIdB) {
+//       queryB = queryB
+//         .where("timestamp_column", ">", lastFetchedTimestampB)
+//         .orWhere("id_column", ">", lastFetchedIdB); // Replace timestamp_column with the actual timestamp column name;
+//     }
+//     const newDataB = await queryB;
+
+//     if (newDataB.length > 0) {
+//       lastFetchedTimestampB = newDataB[newDataB.length - 1].timestamp_column;
+//       lastFetchedIdB = newDataA[newDataA.length - 1].id_column;
+
+//       await cloudDB("tableB").insert(newDataB);
+//     }
+//     res.send("Done!");
+//   } catch (error) {
+//     console.error("Error processing cloudDB table A:", error);
+//     res.send({ message: "error", error: error.message });
+//   }
+// });
+
+// app.get("/", async (req, res) => {
+//   try {
+//     // Check for new data in cloudDB table A
+//     let queryA = await cloudDB("IMPL_I_TABLE").select("*").where();
+//     lastFetchedTimestampA = queryA[queryA.length - 1].REQDATETIME;
+//     // if (lastFetchedTimestampA || lastFetchedIdA) {
+//     //   queryA = queryA
+//     //     .where("REQDATETIME", ">", lastFetchedTimestampA)
+//     //     .orWhere("id_column", ">", lastFetchedIdA); // Replace timestamp_column with the actual timestamp column name
+//     // }
+//     // const newDataA = await queryA;
+
+//     // if (newDataA.length > 0) {
+//     //   // Update last fetched timestamp for table A
+//     //   lastFetchedTimestampA = newDataA[newDataA.length - 1].timestamp_column; // Update timestamp_column with the actual timestamp column name
+//     //   lastFetchedIdA = newDataA[newDataA.length - 1].id_column;
+
+//     //   // Insert new data into localDB table A
+//     //   await localDB("tableA").insert(newDataA);
+//     // }
+
+//     // let queryB = localDB("IMPL_MACHINEMASTER").select("MACHINEID");
+//     // if (lastFetchedTimestampB || lastFetchedIdB) {
+//     //   queryB = queryB
+//     //     .where("timestamp_column", ">", lastFetchedTimestampB)
+//     //     .orWhere("id_column", ">", lastFetchedIdB); // Replace timestamp_column with the actual timestamp column name;
+//     // }
+//     // const newDataB = await queryB;
+
+//     // if (newDataB.length > 0) {
+//     //   lastFetchedTimestampB = newDataB[newDataB.length - 1].timestamp_column;
+//     //   lastFetchedIdB = newDataA[newDataA.length - 1].id_column;
+
+//     //   await cloudDB("tableB").insert(newDataB);
+//     // }
+//     res.send({
+//       msg: "Done!",
+//       data: lastFetchedTimestampA,
+//       d2: queryA[queryA.length - 1].REQDATETIME,
+//       d3: new Date(),
+//     });
+//   } catch (error) {
+//     console.error("Error processing cloudDB table A:", error);
+//     res.send({ message: "error", error: error.message });
+//   }
+// });
+
+// const cron = require("node-cron");
+
+// Test
+// Define the function to be called
+// async function myRouteHandler() {
+//   try {
+//     // Check for new data in cloudDB table A
+//     let queryA = cloudDB("IMPL_MACHINEMASTER").select("MACHINEID");
+//     if (lastFetchedTimestampA || lastFetchedIdA) {
+//       queryA = queryA
+//         .where("timestamp_column", ">", lastFetchedTimestampA)
+//         .orWhere("id_column", ">", lastFetchedIdA); // Replace timestamp_column with the actual timestamp column name
+//     }
+//     const newDataA = await queryA;
+
+//     if (newDataA.length > 0) {
+//       // Update last fetched timestamp for table A
+//       lastFetchedTimestampA = newDataA[newDataA.length - 1].timestamp_column; // Update timestamp_column with the actual timestamp column name
+//       lastFetchedIdA = newDataA[newDataA.length - 1].id_column;
+
+//       // Insert new data into localDB table A
+//       await localDB("tableA").insert(newDataA);
+//     }
+
+//     let queryB = localDB("IMPL_MACHINEMASTER").select("MACHINEID");
+//     if (lastFetchedTimestampB || lastFetchedIdB) {
+//       queryB = queryB
+//         .where("timestamp_column", ">", lastFetchedTimestampB)
+//         .orWhere("id_column", ">", lastFetchedIdB); // Replace timestamp_column with the actual timestamp column name;
+//     }
+//     const newDataB = await queryB;
+
+//     if (newDataB.length > 0) {
+//       lastFetchedTimestampB = newDataB[newDataB.length - 1].timestamp_column;
+//       lastFetchedIdB = newDataA[newDataA.length - 1].id_column;
+
+//       await cloudDB("tableB").insert(newDataB);
+//     }
+//   } catch (error) {
+//     console.error("Error processing cloudDB table A:", error);
+//   }
+// }
+
+// Actual requirement
+// async function myRouteHandler() {
+//   try {
+//     // Check for new data in cloudDB table A
+//     let queryA = cloudDB("IMPL_I_TABLE").select("*");
+//     if (lastFetchedTimestampA || lastFetchedIdA) {
+//       queryA = queryA
+//         .where("REQDATETIME", ">", lastFetchedTimestampA)
+//         .orWhere("id_column", ">", lastFetchedIdA); // Replace timestamp_column with the actual timestamp column name
+//     }
+//     const newDataA = await queryA;
+
+//     if (newDataA.length > 0) {
+//       // Update last fetched timestamp for table A
+//       lastFetchedTimestampA = newDataA[newDataA.length - 1].timestamp_column; // Update timestamp_column with the actual timestamp column name
+//       lastFetchedIdA = newDataA[newDataA.length - 1].id_column;
+
+//       // Insert new data into localDB table A
+//       await localDB("tableA").insert(newDataA);
+//     }
+
+//     let queryB = localDB("IMPL_MACHINEMASTER").select("MACHINEID");
+//     if (lastFetchedTimestampB || lastFetchedIdB) {
+//       queryB = queryB
+//         .where("timestamp_column", ">", lastFetchedTimestampB)
+//         .orWhere("id_column", ">", lastFetchedIdB); // Replace timestamp_column with the actual timestamp column name;
+//     }
+//     const newDataB = await queryB;
+
+//     if (newDataB.length > 0) {
+//       lastFetchedTimestampB = newDataB[newDataB.length - 1].timestamp_column;
+//       lastFetchedIdB = newDataA[newDataA.length - 1].id_column;
+
+//       await cloudDB("tableB").insert(newDataB);
+//     }
+//   } catch (error) {
+//     console.error("Error processing cloudDB table A:", error);
+//   }
+// }
+
+// // Schedule the route handler function to run every 5 seconds
+// cron.schedule("*/5 * * * * *", () => {
+//   myRouteHandler();
+// });
