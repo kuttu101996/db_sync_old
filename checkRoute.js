@@ -26,6 +26,7 @@ checkRouter.get("/getRows/I_Table", async (req, res) => {
     //   .where("isSynced", true)
     //   .update({ isSynced: false });
     const i_table_rows = await cloudDB("IMPL_I_TABLE").select("*");
+    // .where({ isSynced: false });
     res.json({ msg: "Success", data: i_table_rows });
   } catch (error) {
     console.error("Error fetching rows:", error);
@@ -66,11 +67,9 @@ checkRouter.get("/getRows/Impl_MachineParam", async (req, res) => {
     // let data = await cloudDB("IMPL_I_TABLE")
     //   .where("isSynced", true)
     //   .update({ isSynced: false });
-    const impl_machineparam_rows = await localDB("IMPL_MACHINEPARAM").select(
-      "*"
-    );
+    const impl_mp_rows = await localDB("IMPL_MACHINEPARAM").select("*");
     // .where({ isSynced: false });
-    res.json({ msg: "Success", data: impl_machineparam_rows });
+    res.json({ msg: "Success", data: impl_mp_rows });
   } catch (error) {
     console.error("Error fetching rows:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -157,7 +156,8 @@ checkRouter.get("/I_Table/:row_id", async function (req, res) {
 
       data = await cloudDB("IMPL_I_TABLE")
         .where({ ROW_ID: row_id })
-        .update({ isSynced: true });
+        .update({ isSynced: true })
+        .returning("*");
 
       return res.send({ msg: "Success", data, add2Local });
     }
@@ -190,7 +190,8 @@ checkRouter.get("/Impl_Param/:row_id", async function (req, res) {
 
       data = await cloudDB("IMPL_PARAM")
         .where({ ROW_ID: row_id })
-        .update({ isSynced: true });
+        .update({ isSynced: true })
+        .returning("*");
 
       return res.send({ msg: "Success", data, add2Local });
     }
@@ -302,6 +303,192 @@ checkRouter.get("/Impl_SampleData/:row_id", async function (req, res) {
     }
 
     return res.send({ msg: "All data up to date", data });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({
+      msg: "An error occurred while updating the isSynced status.",
+      error,
+    });
+  }
+});
+
+//Sync reverse
+checkRouter.delete("/I_Table/:row_id", async (req, res) => {
+  try {
+    const { row_id } = req.params;
+    const localCheck = await localDB("IMPL_I_TABLE")
+      .where({ ROW_ID: row_id })
+      .first();
+
+    const data = await cloudDB("IMPL_I_TABLE")
+      .where({ ROW_ID: row_id })
+      .update({ isSynced: false });
+
+    if (!localCheck) {
+      return res.send({
+        msg: "Success",
+        additional: "Data not presentin localDB",
+        data,
+      });
+    }
+
+    let deleting = await localDB("IMPL_I_TABLE")
+      .where({ ROW_ID: row_id })
+      .delete();
+
+    return res.send({
+      msg: "Success",
+      additional: deleting,
+      data,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({
+      msg: "An error occurred while updating the isSynced status.",
+      error,
+    });
+  }
+});
+
+checkRouter.delete("/Impl_Param/:row_id", async (req, res) => {
+  try {
+    const { row_id } = req.params;
+    const localCheck = await localDB("IMPL_PARAM")
+      .where({ ROW_ID: row_id })
+      .first();
+
+    const data = await cloudDB("IMPL_PARAM")
+      .where({ ROW_ID: row_id })
+      .update({ isSynced: false });
+
+    if (!localCheck) {
+      return res.send({
+        msg: "Success",
+        additional: "Data not presentin localDB",
+        data,
+      });
+    }
+
+    let deleting = await localDB("IMPL_PARAM")
+      .where({ ROW_ID: row_id })
+      .delete();
+
+    return res.send({
+      msg: "Success",
+      additional: deleting,
+      data,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({
+      msg: "An error occurred while updating the isSynced status.",
+      error,
+    });
+  }
+});
+
+checkRouter.delete("/Impl_MacID/:row_id", async (req, res) => {
+  try {
+    const { row_id } = req.params;
+    const cloudCheck = await cloudDB("IMPL_MACID")
+      .where({ ROW_ID: row_id })
+      .first();
+
+    const data = await localDB("IMPL_MACID")
+      .where({ ROW_ID: row_id })
+      .update({ isSynced: false });
+
+    if (!cloudCheck) {
+      return res.send({
+        msg: "Success",
+        additional: "Data not presentin localDB",
+        data,
+      });
+    }
+
+    let deleting = await cloudDB("IMPL_MACID")
+      .where({ ROW_ID: row_id })
+      .delete();
+
+    return res.send({
+      msg: "Success",
+      additional: deleting,
+      data,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({
+      msg: "An error occurred while updating the isSynced status.",
+      error,
+    });
+  }
+});
+
+checkRouter.delete("/Impl_MachineParam/:row_id", async (req, res) => {
+  try {
+    const { row_id } = req.params;
+    const cloudCheck = await cloudDB("IMPL_MACHINEPARAM")
+      .where({ ROW_ID: row_id })
+      .first();
+
+    const data = await localDB("IMPL_MACHINEPARAM")
+      .where({ ROW_ID: row_id })
+      .update({ isSynced: false });
+
+    if (!cloudCheck) {
+      return res.send({
+        msg: "Success",
+        additional: "Data not presentin localDB",
+        data,
+      });
+    }
+
+    let deleting = await cloudDB("IMPL_MACHINEPARAM")
+      .where({ ROW_ID: row_id })
+      .delete();
+
+    return res.send({
+      msg: "Success",
+      additional: deleting,
+      data,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({
+      msg: "An error occurred while updating the isSynced status.",
+      error,
+    });
+  }
+});
+
+checkRouter.delete("/Impl_SampleData/:row_id", async (req, res) => {
+  try {
+    const { row_id } = req.params;
+    const cloudCheck = await cloudDB("IMPL_SAMPLEDATA")
+      .where({ ROW_ID: row_id })
+      .first();
+
+    const data = await localDB("IMPL_SAMPLEDATA")
+      .where({ ROW_ID: row_id })
+      .update({ isSynced: false });
+
+    if (!cloudCheck) {
+      return res.send({
+        msg: "Success",
+        additional: "Data not presentin localDB",
+        data,
+      });
+    }
+
+    let deleting = await cloudDB("IMPL_SAMPLEDATA")
+      .where({ ROW_ID: row_id })
+      .delete();
+
+    return res.send({
+      msg: "Success",
+      additional: deleting,
+      data,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send({
