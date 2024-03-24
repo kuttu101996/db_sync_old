@@ -5,7 +5,7 @@ const tryRouter = require("express").Router();
 tryRouter.post("/", async (req, res) => {
   try {
     const obj = req.body;
-    let data = await localDB("IMPL_SAMPLEDATA").insert(obj).returning("*");
+    let data = await localDB("IMPL_MACID").insert(obj).returning("*");
 
     return res.send({ msg: "Success", data });
   } catch (error) {
@@ -14,17 +14,17 @@ tryRouter.post("/", async (req, res) => {
   }
 });
 
-tryRouter.get("/getRowS", async (req, res) => {
+tryRouter.get("/change_isSynced_status", async (req, res) => {
   try {
-    // let data = await cloudDB("IMPL_I_TABLE")
-    //   .where("isSynced", true)
-    //   .update({ isSynced: false });
-    const impl_macid_rows = await localDB("IMPL_MACID").select("*");
-    const impl_machineparam_rows = await localDB("IMPL_MACHINEPARAM").select(
-      "*"
-    );
-    const impl_sampledata_rows = await localDB("IMPL_SAMPLEDATA").select("*");
-    res.json({ impl_macid_rows, impl_machineparam_rows, impl_sampledata_rows });
+    let data = await cloudDB("IMPL_PARAM")
+      .where("isSynced", true)
+      .update({ isSynced: false });
+    // const impl_macid_rows = await localDB("IMPL_MACID").select("*");
+    // const impl_machineparam_rows = await localDB("IMPL_MACHINEPARAM").select(
+    //   "*"
+    // );
+    // const impl_sampledata_rows = await localDB("IMPL_SAMPLEDATA").select("*");
+    res.json(data);
   } catch (error) {
     console.error("Error fetching rows:", error);
     res.status(500).json({ error: "Internal Server Error" });
