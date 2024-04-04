@@ -1,0 +1,7 @@
+    ---------- How ----------
+1. create a new column name isSynced (Boolean)
+2. first time take all data and add one by one with isSynced value (true)
+3. Next every time when get and add data from one table to another change the isSynced status from (false - true)
+
+    ---------- Requirements ----------
+1. When ever a new data entered by default the isSynced column value must be false (This will help to filter the data which are not synced yet)
