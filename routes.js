@@ -36,12 +36,26 @@ router.get("/getRows/I_Table", async (req, res) => {
 
 router.get("/getRows/Impl_Param", async (req, res) => {
   try {
-    // let data = await cloudDB("IMPL_I_TABLE")
-    //   .where("isSynced", true)
-    //   .update({ isSynced: false });
-    const impl_param_rows = await cloudDB("IMPL_PARAM").select("*");
-    // .where({ isSynced: false });
-    res.json({ msg: "Success", data: impl_param_rows });
+    const impl_param_cloud_rows = await cloudDB("IMPL_PARAM").select("*");
+    const impl_param_local_rows = await cloudDB("IMPL_PARAM").select("*");
+    if (impl_param_cloud_rows.length === impl_param_local_rows.length)
+      return res.status(200).json({ msg: "up-to-date" });
+
+    await localDB("IMPL_PARAM").delete();
+
+    const insertion = impl_param_cloud_rows.map(
+      async (item) =>
+        await localDB("IMPL_PARAM")
+          .insert({
+            ...item,
+          })
+          .returning("*")
+    );
+    res.json({
+      msg: "Success",
+      insertion_length: insertion.length,
+      impl_param_cloud_rows_length: impl_param_cloud_rows.length,
+    });
   } catch (error) {
     console.error("Error fetching rows:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -312,7 +326,7 @@ router.get("/Impl_SampleData/:row_id", async function (req, res) {
   }
 });
 
-//Sync reverse
+// Sync reverse
 router.delete("/I_Table/:row_id", async (req, res) => {
   try {
     const { row_id } = req.params;
